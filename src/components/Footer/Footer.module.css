@@ -1,0 +1,6 @@
+/* Footer.module.css */
+
+.custom-scroll-button {
+  margin: 0; /* Set margin to 0 */
+  margin-left: 0 !important; /* Remove left margin */
+}

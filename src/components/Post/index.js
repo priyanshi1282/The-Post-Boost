@@ -24,12 +24,13 @@ import {
 } from '@chakra-ui/react';
 import { BiTrash } from 'react-icons/bi';
 import { useAuth } from 'hooks/auth';
-import { FaChevronDown } from 'react-icons/fa';
-
+// import { FaChevronDown } from 'react-icons/fa';
 import {getFirestore, collection, addDoc, onSnapshot,  doc, deleteDoc, getDocs, getDoc, } from 'firebase/firestore';
 import { db } from 'lib/firebase';
 import { Link as ChakraLink } from '@chakra-ui/react';
 
+
+import TopEngagers from './TopEngager'; 
 
 export default function Post() {
   const { user } = useAuth();
@@ -44,15 +45,37 @@ export default function Post() {
   const [todaysPosts, setTodaysPosts] = useState([]);
   const [previousPosts, setPreviousPosts] = useState([]);
   const [visiblePreviousPostCount, setVisiblePreviousPostCount] = useState(1);
+  const [topEngagers, setTopEngagers] = useState([]);
+  const [topEngagerUsernames, setTopEngagerUsernames] = useState([]);
 
 
 
   const postsToLoadPerClick = 2;
-
   const firestore = getFirestore();
   const { colorMode } = useColorMode();
   
- 
+ useEffect(() => {
+  
+    const fetchTopEngagersUsernames = async () => {
+      const usernames = await Promise.all(
+        topEngagers.map(async (userId) => {
+          const userDocRef = doc(db, 'users', userId);
+          const userDoc = await getDoc(userDocRef);
+          const userData = userDoc.data();
+
+          if (userData) {
+            return userData.username;
+          }
+          return null;
+        })
+      );
+      setTopEngagerUsernames(usernames);
+    };  
+
+    fetchTopEngagersUsernames();
+  }, [topEngagers]);
+
+  
 
    
   const requiredClicksToEngage = 3;
@@ -151,36 +174,57 @@ const fetchPosts = useCallback(async () => {
       const userDocRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userDocRef);
       const userData = userDoc.data();
-
-      fetchedPostsData.push({
-        id: postDoc.id,
-        ...postData,
-        ...post,
-        isToday: true,
-        username: userData.username,
-        avatar: userData.avatar,
-        postDate: postDate,
-      });
+    
+      if (userData) { // Add this check
+        fetchedPostsData.push({
+          id: postDoc.id,
+          ...postData,
+          ...post,
+          isToday: true,
+          username: userData.username,
+          avatar: userData.avatar,
+          postDate: postDate,
+        });
+      }
     } else {
       // Fetch user data for previous posts
       const userId = postData.userId;
       const userDocRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userDocRef);
       const userData = userDoc.data();
-
-      fetchedPostsData.push({
-        ...post,
-        isToday: false,
-        username: userData.username, // Adding username for previous posts
-        avatar: userData.avatar,     // Adding avatar for previous posts
-        postDate: postDate,
-      });
+    
+      if (userData) { // Add this check
+        fetchedPostsData.push({
+          ...post,
+          isToday: false,
+          username: userData.username,
+          avatar: userData.avatar,
+          postDate: postDate,
+        });
+      }
     }
   }
 
   const sortedPosts = fetchedPostsData.sort((a, b) => b.postDate - a.postDate);
   setTodaysPosts(sortedPosts.filter(post => post.isToday));
   setPreviousPosts(sortedPosts.filter(post => !post.isToday));
+
+
+  const engagementCounts = {};
+  for (const post of sortedPosts) {
+    const clicksCollectionRef = collection(firestore, 'posts', post.id, 'clicks');
+    const clicksQuerySnapshot = await getDocs(clicksCollectionRef);
+
+    clicksQuerySnapshot.forEach(clickDoc => {
+      const userId = clickDoc.data().userId;
+      engagementCounts[userId] = (engagementCounts[userId] || 0) + 1;
+    });
+  }
+  const sortedEngagers = Object.keys(engagementCounts).sort(
+    (a, b) => engagementCounts[b] - engagementCounts[a]
+  );
+  setTopEngagers(sortedEngagers);
+
 }, [firestore]);
 
   
@@ -220,16 +264,22 @@ const fetchPosts = useCallback(async () => {
     }
   };
   
-  
-    
-
-
-
 
   return (
           <Box bg= "gray.100" minH="100vh" p="4"  overflowY="auto">
-          
-
+                   
+                      <Flex
+                          position="fixed"
+                          spacing = "1"  
+                          top="70px" /* Adjust the value as needed */
+                          left="4"
+                          mt="2"
+                          direction="row"
+                          alignItems="flex-start"
+                        >
+                          <TopEngagers topEngagerUsernames={topEngagerUsernames} />
+                      </Flex>
+     
           {isCooldown && (
                   <Text>Cooldown: {Math.floor(cooldownTime / 60)}:{cooldownTime % 60 < 10 ? '0' : ''}{cooldownTime % 60}</Text>
                 )}
@@ -280,8 +330,11 @@ const fetchPosts = useCallback(async () => {
                       </Button>
                     </VStack>
                   </Container>
-
                 </Center>
+
+
+
+                
 
                 <Container maxW="xl" mt="8" >
                   <Box maxHeight="60vh" 
@@ -292,12 +345,13 @@ const fetchPosts = useCallback(async () => {
                     </Text>
                   )}
                   {todaysPosts.map((post, index) => (
-                    <Box key={index} bg={colorMode === 'dark' ? 'gray.800' : 'white'} boxShadow="md" rounded="lg" p="4" mt="4">
+                    <Box key={index} bg={colorMode === 'dark' ? 'gray.800' : 'white'}  boxShadow="md" rounded="lg" p="4" mt="4" border="1px "  
+                    >
                       <Flex align="center">
                         <Avatar src={post.avatar} alt="User Profile" mr="2" />
+                        <Text fontWeight="bold">{post.username}</Text>
                         <VStack align="start">
-                          <Text fontWeight="bold">{post.username}</Text>
-                          <Text color="">
+                          <Text color="black">
                             {new Intl.DateTimeFormat('en-US', {
                               month: 'long',
                               day: 'numeric',
@@ -321,6 +375,7 @@ const fetchPosts = useCallback(async () => {
                         </ChakraLink>
                       )}
                       <Text fontWeight= "bold" mt="2">{post.content}</Text>
+
                       <Flex mt="4" align="center">
                         <Spacer />
                         {post.userId === user.uid && (
@@ -343,11 +398,13 @@ const fetchPosts = useCallback(async () => {
                     </Text>
                   )}
                   {previousPosts.slice(0, visiblePreviousPostCount).map((post, index) => (
-                    <Box key={index} bg={colorMode === 'dark' ? 'gray.800' : 'white'} boxShadow="md" rounded="md" p="4" mt="4">
+                    <Box key={index} bg={colorMode === 'dark' ? 'gray.800' : 'white'} boxShadow="md" rounded="md" p="4" mt="4"  border="1px "  
+                    >
                       <Flex align="center">
                         <Avatar src={post.avatar} alt="User Profile" mr="2" />
+                        <Text fontWeight="bold">{post.username}</Text>
                         <VStack align="start">
-                          <Text fontWeight="bold">{post.username}</Text>
+                        
                           <Text color="">
                             {new Intl.DateTimeFormat('en-US', {
                               month: 'long',
@@ -369,6 +426,7 @@ const fetchPosts = useCallback(async () => {
                           onClick={() => handleLinkClick(post.id, post.link)}
                         >
                           {post.link}
+                          
                         </ChakraLink>
                       )}
                       <Text fontWeight = "bold" mt="2">{post.content}</Text>
@@ -397,17 +455,24 @@ const fetchPosts = useCallback(async () => {
                               justifyContent="center" 
                               >
                             
-                            <IconButton
-                            icon={<FaChevronDown />}
-                            colorScheme="blue"
-                            onClick={() => setVisiblePreviousPostCount(prevCount => prevCount + postsToLoadPerClick)}
-                          />
+                            <Button
+                                  colorScheme="blue"
+                                  variant="outline"
+                                  onClick={() =>
+                                    setVisiblePreviousPostCount(prevCount => prevCount + postsToLoadPerClick)
+                                  }
+                                >
+                                  Load More
+                            </Button>
                     </Flex>
                     )}
 
+                 
                     <Spacer />
                   </Box>
                 </Container>
+
+    
           </Box>
   );
 }

@@ -67,6 +67,14 @@ const AboutUs = () => {
             <Text fontSize="lg" color="gray.600">
               We were inspired by the power of networking and the impact it can have on your professional journey. We wanted to create a platform that would help individuals grow their LinkedIn profiles through mutual engagement.
             </Text>
+
+            <Heading as="h1" size="xl" fontWeight="bold" color="gray.800">
+              Additional
+            </Heading>
+            <Text fontSize="lg" color="gray.600">
+             Hey! I am a solo creator of this website and my intentions are purely of support. I am trying to get this website upto public standards and beyond but I need your help. In all honesty, I am terrible at front end and I would love your support for the same. 
+             While I cannot offer monetary compensation, if you are interested in making something truly valuable for people, ping me on LinkedIn and we will make this better and better. As Buzz Lightyear would say 'To infinity and beyond!''
+            </Text>
           </Stack>
 
           <Grid

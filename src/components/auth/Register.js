@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -5,33 +6,45 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  IconButton,
   Heading,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   Text,
 } from "@chakra-ui/react";
-
-
-import { FaGoogle } from "react-icons/fa"; // Import Google icon
-import { LOGIN , DASHBOARD } from "lib/routes";
+import { LOGIN } from "lib/routes";
 import { Link as RouterLink } from "react-router-dom";
 import { useRegister } from "hooks/auth";
-import { useLogin } from "hooks/auth";
 import { useForm } from "react-hook-form";
 import {
   emailValidate,
   passwordValidate,
-  usernameValidate,
+  usernameValidate as originalUsernameValidate,
 } from "utils/form-validate";
+import { RiEyeLine, RiEyeOffLine } from "react-icons/ri"; // Import visibility icons
 
 export default function Register() {
   const { register: signup, isLoading } = useRegister();
-  const { login, isLoading: loginIsLoading } = useLogin(); // Destructure login and isLoading from useLogin
+
+
+
+  const usernameValidate = {
+    ...originalUsernameValidate,
+    pattern: {
+      value: /^[A-Za-z]+$/, // Only alphabetical characters are allowed
+      message: "Username can only contain alphabetical characters.",
+    },
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
   async function handleRegister(data) {
     signup({
@@ -42,18 +55,9 @@ export default function Register() {
     });
   }
 
-  async function handleGoogleLogin() {
-    const loginResponse = await login({ isGoogleLogin: true, redirectTo: DASHBOARD });
-    
-    // You might need to check the content of loginResponse or how your authentication library handles redirects
-    if (loginResponse && loginResponse.redirectTo === DASHBOARD) {
-      window.location.href = DASHBOARD; // Redirect the user to the dashboard
-    }
-  }
-
   return (
     <Center w="100%" h="100vh">
-      <Box mx="1" maxW="" p="9" borderWidth="1px" borderRadius="lg">
+      <Box Box mx="1" maxW="400px" p="4" borderWidth="1px" borderRadius="lg">
         <Heading mb="4" size="lg" textAlign="center">
           Sign Up
         </Heading>
@@ -65,6 +69,7 @@ export default function Register() {
               placeholder="username"
               {...register("username", usernameValidate)}
             />
+
             <FormErrorMessage>
               {errors.username && errors.username.message}
             </FormErrorMessage>
@@ -82,11 +87,21 @@ export default function Register() {
           </FormControl>
           <FormControl isInvalid={errors.password} py="2">
             <FormLabel>Password</FormLabel>
-            <Input
-              type="password"
-              placeholder="password123"
-              {...register("password", passwordValidate)}
-            />
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"} // Toggle password visibility
+                placeholder="password123"
+                {...register("password", passwordValidate)}
+              />
+              <InputRightElement>
+                <IconButton
+                  variant="ghost"
+                  color="black"
+                  icon={showPassword ? <RiEyeOffLine /> : <RiEyeLine />}
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              </InputRightElement>
+            </InputGroup>
             <FormErrorMessage>
               {errors.password && errors.password.message}
             </FormErrorMessage>
@@ -95,6 +110,7 @@ export default function Register() {
             mt="4"
             type="submit"
             colorScheme="blue"
+            bgColor="black"
             size="md"
             w="full"
             isLoading={isLoading}
@@ -112,31 +128,11 @@ export default function Register() {
             color="black"
             fontWeight="medium"
             textDecor="underline"
-          
           >
             Log In
           </Link>{" "}
           instead!
         </Text>
-
-        <Button
-          mt="4"
-          type="button"
-          bgColor="#ffffff"
-          border="1px solid #ccc"
-          color="black"
-          fontWeight="normal"
-          _hover={{ bgColor: "#f5f5f5" }}
-          size="md"
-          w="full"
-          isLoading={isLoading || loginIsLoading} // Combine isLoading states
-          loadingText="Signing Up"
-          onClick={handleGoogleLogin}
-        >
-          <FaGoogle style={{ marginRight: "0.5rem", color: "#4285F4" }} /> Sign in with Google
-        </Button>
-
-        
       </Box>
     </Center>
   );

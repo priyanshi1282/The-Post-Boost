@@ -10,7 +10,7 @@ export default function TopEngagers({ topEngagerUsernames }) {
       rounded="lg"
       w="250px"
       marginLeft="10px"
-      zIndex="10"
+      // zIndex="10"
     >
       {topEngagerUsernames.length > 0 && (
         <VStack spacing="2" align="stretch">

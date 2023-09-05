@@ -23,7 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { BiTrash } from "react-icons/bi";
 import { useAuth } from "hooks/auth";
-// import { FaChevronDown } from 'react-icons/fa';
+
 import './post.css';
 import {
   getFirestore,
@@ -279,9 +279,9 @@ export default function Post() {
       <span>+</span>
     </div>
       <Flex
-        // position="fixed"
+      
         spacing="1"
-        top="70px" /* Adjust the value as needed */
+        top="70px" 
         left="4"
         // mt="2"
         direction="row"

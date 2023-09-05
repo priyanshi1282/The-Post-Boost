@@ -96,6 +96,21 @@ const AboutUs = () => {
                 <Text fontSize="xl" fontWeight="medium" color="gray.800" mt={2}>
                   Anuj 
                 </Text>
+                
+              </Box>
+            </GridItem>
+            <GridItem>
+              <Box textAlign="center">
+                <Image
+                  rounded="full"
+                  // src="/images/hi.png"
+                  alt="Anuj Pathak - Founder"
+                  display={{ base: "none", md: "block" }}
+                />
+                <Text fontSize="xl" fontWeight="medium" color="gray.800" mt={2}>
+                  Anirudh
+                </Text>
+                
               </Box>
             </GridItem>
             {/* Add similar GridItem components for other members */}

@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Button,
-  Flex,
-  Box,
-  HStack,
-  Link,
-  Image,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from '@chakra-ui/react';
+import React from 'react';
+import { Button, Flex, Box, HStack, Link, Image } from '@chakra-ui/react';
 import { DASHBOARD, ABOUT, CONTACT } from 'lib/routes';
 import { Link as RouterLink } from 'react-router-dom';
 import { useLogout } from 'hooks/auth';
 
 export default function Navbar() {
   const { logout, isLoading } = useLogout();
-  const [isMenuOpen, setMenuOpen] = useState(false);
 
   return (
     <Flex
@@ -86,36 +74,22 @@ export default function Navbar() {
       </Flex>
 
       <HStack spacing="4">
-        <Menu autoSelect={false}>
-          <MenuButton
-            as={Button}
-            variant="outline"
-            size="md"
-            bgColor="black"
-            color="white"
-            _hover={{
-              bgColor: '#1363DF',
-              color: 'white',
-            }}
-            onClick={() => setMenuOpen(!isMenuOpen)}
-          >
-            Menu
-          </MenuButton>
-          <MenuList>
-            <MenuItem as={RouterLink} to="/my-profile">
-              My Profile
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                logout();
-                setMenuOpen(false);
-              }}
-              isLoading={isLoading}
-            >
-              Logout
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        <Button
+          variant="outline"
+          size="md"
+          bgColor="black"
+          color="white"
+          _hover={{
+            bgColor: '#1363DF',
+            color: 'white',
+          }}
+          onClick={() => {
+            logout();
+          }}
+          isLoading={isLoading}
+        >
+          Logout
+        </Button>
       </HStack>
     </Flex>
   );

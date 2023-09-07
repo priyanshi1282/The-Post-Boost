@@ -1,5 +1,7 @@
 import React from "react";
 import Navbar from "components/navbar";
+
+
 import {
   Box,
   Text,
@@ -12,16 +14,16 @@ import {
   IconButton,
 } 
 from "@chakra-ui/react";
-
 import { FaArrowLeft } from 'react-icons/fa';
 import { DASHBOARD } from 'lib/routes';
 
 import { Link as RouterLink } from "react-router-dom";
-import Footer from "components/Footer";
+import UserProfileSidebar from 'components/sidebar/index.js'
 
 const AboutUs = () => {
   return (
     <Box bgColor="white">
+      <UserProfileSidebar />
       <Navbar />
 
       <IconButton
@@ -35,7 +37,7 @@ const AboutUs = () => {
         position="fixed"
         top="4rem"
         left="1rem"
-        zIndex="1" // Adjust the zIndex to ensure it's above other content
+        zIndex="1" 
       />
 
       <Container maxW="xl" py={20}>
@@ -108,7 +110,7 @@ const AboutUs = () => {
                   display={{ base: "none", md: "block" }}
                 />
                 <Text fontSize="xl" fontWeight="medium" color="gray.800" mt={2}>
-                  Anirudh
+                  Anirudha
                 </Text>
                 
               </Box>
@@ -117,7 +119,7 @@ const AboutUs = () => {
           </Grid>
         </Stack>
       </Container>
-      <Footer />
+      
     </Box>
   );
 };

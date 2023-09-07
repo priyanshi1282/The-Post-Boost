@@ -29,11 +29,12 @@ import {
 } from 'react-icons/md'
 import { BsGithub, BsDiscord, BsPerson } from 'react-icons/bs'
 import Navbar from 'components/navbar'
-import Footer from 'components/Footer'
+import UserProfileSidebar from 'components/sidebar/index.js'
 
 export default function Contact() {
   return (
     <Container bg="white" maxW="full" mt={10}  centerContent overflow="hidden">
+       <UserProfileSidebar />
     <Spacer />
     <Navbar />
       <Flex>
@@ -165,7 +166,7 @@ export default function Contact() {
         </Box>
       </Flex>
 
-      <Footer />
+  
     </Container>
 
 

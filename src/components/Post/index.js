@@ -34,7 +34,8 @@ import {
   deleteDoc,
   getDocs,
   getDoc,
-} from "firebase/firestore";
+}
+from "firebase/firestore";
 import { db } from "lib/firebase";
 import { Link as ChakraLink } from "@chakra-ui/react";
 
@@ -56,11 +57,16 @@ export default function Post() {
   const [topEngagers, setTopEngagers] = useState([]);
   const [topEngagerUsernames, setTopEngagerUsernames] = useState([]);
 
+
+
   const postsToLoadPerClick = 2;
+
+
   const firestore = getFirestore();
   const { colorMode } = useColorMode();
 
   useEffect(() => {
+    
     const fetchTopEngagersUsernames = async () => {
       const usernames = await Promise.all(
         topEngagers.map(async (userId) => {
@@ -80,8 +86,14 @@ export default function Post() {
     fetchTopEngagersUsernames();
   }, [topEngagers]);
 
+
+
+  
   const requiredClicksToEngage = 3;
-  const handleCreatePost = async () => {
+
+
+
+const handleCreatePost = async () => {
     if (userEngagedClicks < requiredClicksToEngage) {
       setEngagementMessage(
         "you need to engage at least 3 posts before creating a new post."
@@ -136,7 +148,7 @@ export default function Post() {
       }
     }
   };
-  const handleLinkClick = async (postId, postLink) => {
+const handleLinkClick = async (postId, postLink) => {
     try {
       // Increment click count for the specific post link
       const clicksCollectionRef = collection(
@@ -158,7 +170,7 @@ export default function Post() {
     }
   };
 
-  const fetchPosts = useCallback(async () => {
+const fetchPosts = useCallback(async () => {
     const postsQuerySnapshot = await getDocs(collection(firestore, "posts"));
     const fetchedPostsData = [];
 
@@ -183,7 +195,7 @@ export default function Post() {
         const userData = userDoc.data();
 
         if (userData) {
-          // Add this check
+          
           fetchedPostsData.push({
             id: postDoc.id,
             ...postData,
@@ -222,12 +234,7 @@ export default function Post() {
 
     const engagementCounts = {};
     for (const post of sortedPosts) {
-      const clicksCollectionRef = collection(
-        firestore,
-        "posts",
-        post.id,
-        "clicks"
-      );
+      const clicksCollectionRef = collection(firestore,"posts",post.id,"clicks");
       const clicksQuerySnapshot = await getDocs(clicksCollectionRef);
 
       clicksQuerySnapshot.forEach((clickDoc) => {
@@ -235,10 +242,17 @@ export default function Post() {
         engagementCounts[userId] = (engagementCounts[userId] || 0) + 1;
       });
     }
-    const sortedEngagers = Object.keys(engagementCounts).sort(
-      (a, b) => engagementCounts[b] - engagementCounts[a]
-    );
+   
+    const sortedEngagers = Object.keys(engagementCounts)
+    .filter((userId) => engagementCounts[userId] >= 10) // Filter users with at least 10 engagements
+    .sort((a, b) => engagementCounts[b] - engagementCounts[a])
+    .slice(0, 5);
+
     setTopEngagers(sortedEngagers);
+    setTopEngagerUsernames(sortedEngagers.map((userId) => engagementCounts[userId]));
+
+
+  
   }, [firestore]);
 
   useEffect(() => {
@@ -274,231 +288,231 @@ export default function Post() {
   };
 
   return (
-    <Box bg="gray.100" display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
-    <div id='floating-btn'>
-      <span>+</span>
-    </div>
-      <Flex
-      
-        spacing="1"
-        top="70px" 
-        left="4"
-        // mt="2"
-        direction="row"
-        alignItems="flex-start"
-      >
-        <TopEngagers topEngagerUsernames={topEngagerUsernames} />
-      </Flex>
+  <Center >
+     <Box bg="" display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
+  
+  <Flex
+  
+    spacing="1"
+    top="70px" 
+    left="4"
+    // mt="2"
+    direction="row"
+    alignItems="flex-start"
+  >
+    <TopEngagers topEngagerUsernames={topEngagerUsernames} />
+  </Flex>
 
-      <Box flex={1}>
-        {isCooldown && (
-          <Text>
-            Cooldown: {Math.floor(cooldownTime / 60)}:
-            {cooldownTime % 60 < 10 ? "0" : ""}
-            {cooldownTime % 60}
+  <Box flex={1}>
+    {isCooldown && (
+      <Text>
+        Cooldown: {Math.floor(cooldownTime / 60)}:
+        {cooldownTime % 60 < 10 ? "0" : ""}
+        {cooldownTime % 60}
+      </Text>
+    )}
+
+    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Engagement Required</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Text>{engagementMessage}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
+    <Center >
+      <Container
+        maxW="xl"
+        bg={colorMode === "dark" ? "gray.800" : "white"}
+        color={colorMode === "dark" ? "white" : "black"}
+        boxShadow="lg"
+        rounded="lg"
+        p="4"
+      >
+        <VStack spacing="1" align="center">
+        <Box width={'100%'} display={'flex'} marginBottom={2} justifyContent={'space-between'}>
+          <Text display={'inline-block'}  fontSize="2xl" margin={0} fontWeight="bold">
+            Create Your Post
+          </Text>
+          <Button colorScheme="blue" onClick={handleCreatePost}>
+            Post
+          </Button>
+        </Box>
+          <Input
+            type="url"
+            placeholder="Enter a link"
+            value={postLink}
+            onChange={(e) => setPostLink(e.target.value)}
+          />
+          <Textarea
+            placeholder="Feel Free to share your thoughts"
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
+          />
+        </VStack>
+      </Container>
+    </Center>
+
+    <Container maxW="xl" mt="8">
+      <Box >
+        {todaysPosts.length > 0 && (
+          <Text fontSize="xl" fontWeight="bold">
+            Today's Posts
           </Text>
         )}
-
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Engagement Required</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>{engagementMessage}</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <Center >
-          <Container
-            maxW="xl"
+        {todaysPosts.map((post, index) => (
+          <Box
+            key={index}
             bg={colorMode === "dark" ? "gray.800" : "white"}
-            color={colorMode === "dark" ? "white" : "black"}
-            boxShadow="lg"
+            boxShadow="md"
             rounded="lg"
             p="4"
+            mt="4"
+            border="1px "
           >
-            <VStack spacing="1" align="center">
-            <Box width={'100%'} display={'flex'} marginBottom={2} justifyContent={'space-between'}>
-              <Text display={'inline-block'}  fontSize="2xl" margin={0} fontWeight="bold">
-                Create Your Post
-              </Text>
-              <Button colorScheme="blue" onClick={handleCreatePost}>
-                Post
-              </Button>
-            </Box>
-              <Input
-                type="url"
-                placeholder="Enter a link"
-                value={postLink}
-                onChange={(e) => setPostLink(e.target.value)}
-              />
-              <Textarea
-                placeholder="Feel Free to share your thoughts"
-                value={postContent}
-                onChange={(e) => setPostContent(e.target.value)}
-              />
-            </VStack>
-          </Container>
-        </Center>
-
-        <Container maxW="xl" mt="8">
-          <Box >
-            {todaysPosts.length > 0 && (
-              <Text fontSize="xl" fontWeight="bold">
-                Today's Posts
-              </Text>
-            )}
-            {todaysPosts.map((post, index) => (
-              <Box
-                key={index}
-                bg={colorMode === "dark" ? "gray.800" : "white"}
-                boxShadow="md"
-                rounded="lg"
-                p="4"
-                mt="4"
-                border="1px "
-              >
-                <Flex align="center">
-                  <Avatar src={post.avatar} alt="User Profile" mr="2" />
-                  <Text fontWeight="bold">{post.username}</Text>
-                  <VStack align="start">
-                    <Text color="black">
-                      {new Intl.DateTimeFormat("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      }).format(post.postDate)}
-                    </Text>
-                  </VStack>
-                </Flex>
-                {post.link && (
-                  <ChakraLink
-                    color="blue"
-                    href={post.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => handleLinkClick(post.id, post.link)}
-                  >
-                    {post.link}
-                  </ChakraLink>
-                )}
-                <Text fontWeight="bold" mt="2">
-                  {post.content}
+            <Flex align="center">
+              <Avatar src={post.avatar} alt="User Profile" mr="2" />
+              <Text fontWeight="bold">{post.username}</Text>
+              <VStack align="start">
+                <Text color="black">
+                  {new Intl.DateTimeFormat("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  }).format(post.postDate)}
                 </Text>
-
-                <Flex mt="4" align="center">
-                  <Spacer />
-                  {post.userId === user.uid && (
-                    <IconButton
-                      icon={<BiTrash />}
-                      colorScheme="blue"
-                      aria-label="Delete"
-                      onClick={() => handleDeletePost(index, true)}
-                      size="sm"
-                    />
-                  )}
-                </Flex>
-              </Box>
-            ))}
-
-            {previousPosts.length > 0 && (
-              <Text fontSize="xl" fontWeight="bold" mt="4">
-                Previous Posts
-              </Text>
-            )}
-            {previousPosts
-              .slice(0, visiblePreviousPostCount)
-              .map((post, index) => (
-                <Box
-                  key={index}
-                  bg={colorMode === "dark" ? "gray.800" : "white"}
-                  boxShadow="md"
-                  rounded="md"
-                  p="4"
-                  mt="4"
-                  border="1px "
-                >
-                  <Flex align="center">
-                    <Avatar src={post.avatar} alt="User Profile" mr="2" />
-                    <Text fontWeight="bold">{post.username}</Text>
-                    <VStack align="start">
-                      <Text color="">
-                        {new Intl.DateTimeFormat("en-US", {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: true,
-                        }).format(post.postDate)}
-                      </Text>
-                    </VStack>
-                  </Flex>
-                  {post.link && (
-                    <ChakraLink
-                      color="blue"
-                      href={post.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => handleLinkClick(post.id, post.link)}
-                    >
-                      {post.link}
-                    </ChakraLink>
-                  )}
-                  <Text fontWeight="bold" mt="2">
-                    {post.content}
-                  </Text>
-                  <Flex mt="4" align="center">
-                    <Spacer />
-                    {post.userId === user.uid && (
-                      <IconButton
-                        icon={<BiTrash />}
-                        colorScheme="blue"
-                        aria-label="Delete"
-                        onClick={() => handleDeletePost(index, true)}
-                        size="sm"
-                      />
-                    )}
-                  </Flex>
-                </Box>
-              ))}
-
-            {previousPosts.length > visiblePreviousPostCount && (
-              <Flex
-                mt="2"
-                direction="column"
-                p="3"
-                alignItems="center"
-                justifyContent="center"
+              </VStack>
+            </Flex>
+            {post.link && (
+              <ChakraLink
+                color="blue"
+                href={post.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleLinkClick(post.id, post.link)}
               >
-                <Button
-                  colorScheme="blue"
-                  variant="outline"
-                  onClick={() =>
-                    setVisiblePreviousPostCount(
-                      (prevCount) => prevCount + postsToLoadPerClick
-                    )
-                  }
-                >
-                  Load More
-                </Button>
-              </Flex>
+                {post.link}
+              </ChakraLink>
             )}
+            <Text fontWeight="bold" mt="2">
+              {post.content}
+            </Text>
 
-            <Spacer />
+            <Flex mt="4" align="center">
+              <Spacer />
+              {post.userId === user.uid && (
+                <IconButton
+                  icon={<BiTrash />}
+                  colorScheme="blue"
+                  aria-label="Delete"
+                  onClick={() => handleDeletePost(index, true)}
+                  size="sm"
+                />
+              )}
+            </Flex>
           </Box>
-        </Container>
+        ))}
+
+        {previousPosts.length > 0 && (
+          <Text fontSize="xl" fontWeight="bold" mt="4">
+            Previous Posts
+          </Text>
+        )}
+        {previousPosts
+          .slice(0, visiblePreviousPostCount)
+          .map((post, index) => (
+            <Box
+              key={index}
+              bg={colorMode === "dark" ? "gray.800" : "white"}
+              boxShadow="md"
+              rounded="md"
+              p="4"
+              mt="4"
+              border="1px "
+            >
+              <Flex align="center">
+                <Avatar src={post.avatar} alt="User Profile" mr="2" />
+                <Text fontWeight="bold">{post.username}</Text>
+                <VStack align="start">
+                  <Text color="">
+                    {new Intl.DateTimeFormat("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                      hour12: true,
+                    }).format(post.postDate)}
+                  </Text>
+                </VStack>
+              </Flex>
+              {post.link && (
+                <ChakraLink
+                  color="blue"
+                  href={post.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleLinkClick(post.id, post.link)}
+                >
+                  {post.link}
+                </ChakraLink>
+              )}
+              <Text fontWeight="bold" mt="2">
+                {post.content}
+              </Text>
+              <Flex mt="4" align="center">
+                <Spacer />
+                {post.userId === user.uid && (
+                  <IconButton
+                    icon={<BiTrash />}
+                    colorScheme="blue"
+                    aria-label="Delete"
+                    onClick={() => handleDeletePost(index, true)}
+                    size="sm"
+                  />
+                )}
+              </Flex>
+            </Box>
+          ))}
+
+        {previousPosts.length > visiblePreviousPostCount && (
+          <Flex
+            mt="2"
+            direction="column"
+            p="3"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Button
+              colorScheme="blue"
+              variant="outline"
+              onClick={() =>
+                setVisiblePreviousPostCount(
+                  (prevCount) => prevCount + postsToLoadPerClick
+                )
+              }
+            >
+              Load More
+            </Button>
+          </Flex>
+        )}
+
+        <Spacer />
       </Box>
-    </Box>
+    </Container>
+  </Box>
+</Box>
+  </Center>
   );
 }

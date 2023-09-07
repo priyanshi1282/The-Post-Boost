@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/auth';
 import Navbar from '../navbar'
 import Post from '../Post'
 import UserProfileSidebar from '../sidebar'
-import Footer from '../Footer'
+
 
 
   
@@ -31,7 +31,7 @@ export default function Layout() {
       <Navbar />
       <UserProfileSidebar />
       <Post/>
-      <Footer />
+      {/* <Footer /> */}
       <Outlet />
      
     

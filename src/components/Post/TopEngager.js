@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text, VStack, Flex } from '@chakra-ui/react';
 
-export default function TopEngagers({ topEngagerUsernames }) {
+export default function TopEngagers({ topEngagerUsernames } , {engagementCounts}) {
   return (
     <Box
       bg="white"
@@ -20,9 +20,16 @@ export default function TopEngagers({ topEngagerUsernames }) {
           {topEngagerUsernames.map((username, index) => (
             <Flex key={index} p="2" alignItems="center" borderRadius="md" bg="gray.100">
               <Text fontWeight="medium" fontSize="sm">
-                {username}
+                {username}{' '}
+            
+                {index === 0 && ' 👑'}
+                {index === 1 && ' 🥈'}
+                {index === 2 && ' 🥉'}
               </Text>
-            </Flex>
+
+            
+              
+            </Flex> 
           ))}
         </VStack>
       )}

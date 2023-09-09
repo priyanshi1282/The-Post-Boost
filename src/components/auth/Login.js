@@ -34,14 +34,31 @@ function SuccessPopup({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Password Reset Email Sent</ModalHeader>
+      <ModalContent
+        borderRadius="10px"
+        boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
+      >
+        <ModalHeader
+          fontSize="xl"
+          fontWeight="bold"
+          borderBottomWidth="1px"
+          pb="4"
+        >
+          Password Reset Email Sent
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          Please check your email for instructions on resetting your password.
+          <Text fontSize="md" fontWeight="medium">
+            Kindly check your email for instructions on resetting your password.
+          </Text>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="blue" onClick={onClose}>
+        <ModalFooter justifyContent="center">
+          <Button
+            colorScheme="blue"
+            fontWeight="medium"
+            onClick={onClose}
+            w="100px"
+          >
             OK
           </Button>
         </ModalFooter>
@@ -49,7 +66,6 @@ function SuccessPopup({ isOpen, onClose }) {
     </Modal>
   );
 }
-
 export default function Login() {
   const { login, isLoading } = useLogin();
   const {
@@ -66,13 +82,13 @@ export default function Login() {
 
   const handleOpenResetModal = () => {
     setIsResetModalOpen(true);
-    // Clear any previous email validation error
+ 
     setResetEmailError("");
   };
 
   const handleCloseResetModal = () => {
     setIsResetModalOpen(false);
-    setResetEmail(""); // Clear the email input when the modal is closed
+    setResetEmail(""); 
   };
 
   const handleForgotPassword = async (data) => {
@@ -80,11 +96,11 @@ export default function Login() {
 
     try {
       await sendPasswordResetEmail(auth, email);
-      setIsResetModalOpen(false); // Close the reset password modal
-      setIsSuccessPopupOpen(true); // Open the success popup
+      setIsResetModalOpen(false);
+      setIsSuccessPopupOpen(true); 
     } catch (error) {
       console.error("Error sending password reset email:", error.message);
-      // Handle and display the error to the user
+      
       if (error.code === "auth/invalid-email") {
         setResetEmailError("Please enter a valid email address.");
       } else {

@@ -288,7 +288,7 @@ const fetchPosts = useCallback(async () => {
 
   return (
   <Center bgColor= "#F3F2F0">
-     <Box display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
+     <Box display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="10">
   
   <Flex
   
@@ -327,7 +327,7 @@ const fetchPosts = useCallback(async () => {
       </ModalContent>
     </Modal>
 
-    <Center >
+    <Center py = "1">
       <Container
         maxW="xl"
         bg={colorMode === "dark" ? "gray.800" : "white"}

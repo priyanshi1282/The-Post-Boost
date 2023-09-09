@@ -24,7 +24,7 @@ import {
 import { BiTrash } from "react-icons/bi";
 import { useAuth } from "hooks/auth";
 
-import './post.css';
+
 import {
   getFirestore,
   collection,
@@ -38,7 +38,6 @@ import {
 from "firebase/firestore";
 import { db } from "lib/firebase";
 import { Link as ChakraLink } from "@chakra-ui/react";
-
 import TopEngagers from "./TopEngager";
 
 export default function Post() {
@@ -115,7 +114,7 @@ const handleCreatePost = async () => {
       setIsModalOpen(true);
       return;
     }
-
+ 
     setIsCooldown(true);
     setCooldownTime(60); // 1 minutes in seconds
     const cooldownInterval = setInterval(() => {
@@ -246,7 +245,7 @@ const fetchPosts = useCallback(async () => {
     const sortedEngagers = Object.keys(engagementCounts)
     .filter((userId) => engagementCounts[userId] >= 10) // Filter users with at least 10 engagements
     .sort((a, b) => engagementCounts[b] - engagementCounts[a])
-    .slice(0, 5);
+    .slice(0, 3);
 
     setTopEngagers(sortedEngagers);
     setTopEngagerUsernames(sortedEngagers.map((userId) => engagementCounts[userId]));
@@ -288,8 +287,8 @@ const fetchPosts = useCallback(async () => {
   };
 
   return (
-  <Center >
-     <Box bg="" display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
+  <Center bgColor= "#F3F2F0">
+     <Box display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
   
   <Flex
   
@@ -345,6 +344,7 @@ const fetchPosts = useCallback(async () => {
           <Button colorScheme="blue" onClick={handleCreatePost}>
             Post
           </Button>
+         
         </Box>
           <Input
             type="url"
@@ -365,7 +365,7 @@ const fetchPosts = useCallback(async () => {
       <Box >
         {todaysPosts.length > 0 && (
           <Text fontSize="xl" fontWeight="bold">
-            Today's Posts
+            Recent Posts
           </Text>
         )}
         {todaysPosts.map((post, index) => (

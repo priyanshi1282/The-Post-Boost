@@ -33,7 +33,7 @@ import UserProfileSidebar from 'components/sidebar/index.js'
 
 export default function Contact() {
   return (
-    <Container bg="white" maxW="full" mt={10}  centerContent overflow="hidden">
+    <Container bg="#F3F2F0" maxW="full" mt={10}  centerContent overflow="hidden">
        <UserProfileSidebar />
     <Spacer />
     <Navbar />

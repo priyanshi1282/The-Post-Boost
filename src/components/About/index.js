@@ -22,7 +22,7 @@ import UserProfileSidebar from 'components/sidebar/index.js'
 
 const AboutUs = () => {
   return (
-    <Box bgColor="white">
+    <Box bgColor="#F3F2F0">
       <UserProfileSidebar />
       <Navbar />
 

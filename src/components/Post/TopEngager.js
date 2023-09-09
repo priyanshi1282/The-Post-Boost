@@ -23,8 +23,8 @@ export default function TopEngagers({ topEngagerUsernames } , {engagementCounts}
                 {username}{' '}
             
                 {index === 0 && ' 👑'}
-                {index === 1 && ' 🥈'}
-                {index === 2 && ' 🥉'}
+                {index === 1 && ' 🥇'}
+                {index === 2 && ' 🥈'}
               </Text>
 
             

@@ -4,12 +4,16 @@
         "Chakra",
         "cooldown",
         "firestore",
+        "fontawesome",
+        "fortawesome",
         "Headingloop",
+        "ismobilejs",
         "Linkify",
         "linkifyjs",
         "MYPROFILE",
         "noopener",
         "noreferrer",
+        "tailwindcss",
         "userengage"
     ]
 }

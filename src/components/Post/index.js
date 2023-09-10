@@ -11,7 +11,9 @@ import {
   Avatar,
   Spacer,
   Textarea,
+
   IconButton,
+ 
   Modal,
   ModalOverlay,
   ModalContent,
@@ -21,7 +23,7 @@ import {
   ModalCloseButton,
   useColorMode,
 } from "@chakra-ui/react";
-import { BiTrash } from "react-icons/bi";
+
 import { useAuth } from "hooks/auth";
 
 
@@ -37,8 +39,10 @@ import {
 }
 from "firebase/firestore";
 import { db } from "lib/firebase";
+
 import { Link as ChakraLink } from "@chakra-ui/react";
 import TopEngagers from "./TopEngager";
+import { BiTrash } from "react-icons/bi";
 
 export default function Post() {
   const { user } = useAuth();
@@ -275,20 +279,25 @@ const fetchPosts = useCallback(async () => {
     return () => unsubscribe();
   }, [firestore, fetchPosts, isCooldown, cooldownTime]);
 
-  const handleDeletePost = async (index, isToday) => {
-    const postToDelete = isToday ? todaysPosts[index] : previousPosts[index];
-
-    if (postToDelete && postToDelete.userId === user.uid) {
-      const postRef = doc(firestore, "posts", postToDelete.id);
-      await deleteDoc(postRef);
-    } else {
-      console.log("You can't delete someone else's post.");
+  const handleDeletePost = async (postId) => {
+    try {
+      // Delete the post document from Firestore
+      await deleteDoc(doc(firestore, "posts", postId));
+  
+      // Remove the deleted post from the state
+      setFetchedPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  
+      // Optionally, you can also remove the post from todaysPosts and previousPosts if it's there
+      setTodaysPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      setPreviousPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
     }
   };
-
+  
   return (
   <Center bgColor= "#F3F2F0">
-     <Box display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="10">
+     <Box display="flex" marginTop={'70px'} gap='10px' minH="100vh" p="4">
   
   <Flex
   
@@ -327,7 +336,7 @@ const fetchPosts = useCallback(async () => {
       </ModalContent>
     </Modal>
 
-    <Center py = "1">
+    <Center >
       <Container
         maxW="xl"
         bg={colorMode === "dark" ? "gray.800" : "white"}
@@ -361,6 +370,10 @@ const fetchPosts = useCallback(async () => {
       </Container>
     </Center>
 
+
+
+
+{/* Recent Post section  */}
     <Container maxW="xl" mt="8">
       <Box >
         {todaysPosts.length > 0 && (
@@ -409,20 +422,22 @@ const fetchPosts = useCallback(async () => {
               {post.content}
             </Text>
 
-            <Flex mt="4" align="center">
-              <Spacer />
-              {post.userId === user.uid && (
-                <IconButton
-                  icon={<BiTrash />}
-                  colorScheme="blue"
-                  aria-label="Delete"
-                  onClick={() => handleDeletePost(index, true)}
-                  size="sm"
-                />
-              )}
+            <Flex >
+            <IconButton
+              colorScheme="red"
+              aria-label="Delete post"
+              icon= {<BiTrash />}
+              onClick={() => handleDeletePost(post.id)}
+            />
             </Flex>
+           
           </Box>
         ))}
+
+
+
+
+{/* Previous Post section  */}
 
         {previousPosts.length > 0 && (
           <Text fontSize="xl" fontWeight="bold" mt="4">
@@ -471,18 +486,15 @@ const fetchPosts = useCallback(async () => {
               <Text fontWeight="bold" mt="2">
                 {post.content}
               </Text>
-              <Flex mt="4" align="center">
-                <Spacer />
-                {post.userId === user.uid && (
-                  <IconButton
-                    icon={<BiTrash />}
-                    colorScheme="blue"
-                    aria-label="Delete"
-                    onClick={() => handleDeletePost(index, true)}
-                    size="sm"
-                  />
-                )}
-              </Flex>
+              <Flex>
+            <IconButton
+              colorScheme="blue"
+              aria-label="Delete post"
+              icon={<BiTrash />}  
+              onClick={() => handleDeletePost(post.id)}
+            />
+            </Flex>
+            
             </Box>
           ))}
 
